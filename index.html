@@ -26,10 +26,20 @@
   <button id="enterStoreBtn">Enter Store</button>
 </div>
 
+<!-- Fixed Shopping Cart Icon - Always Visible -->
+<div class="cart-icon-container" id="cartIconContainer">
+  <svg class="cart-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16.5 5.1 16.5H17M17 13V16.5M9 19.5C9.8 19.5 10.5 20.2 10.5 21S9.8 22.5 9 22.5 7.5 21.8 7.5 21 8.2 19.5 9 19.5ZM20 19.5C20.8 19.5 21.5 20.2 21.5 21S20.8 22.5 20 22.5 18.5 21.8 18.5 21 19.2 19.5 20 19.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span class="cart-count" id="cartCount">0</span>
+</div>
+
 <!-- Store Main Content -->
 <div class="container" style="display: none;">
   <header>
-    <img src="css/imaage/ChatGPT Image Jun 15, 2025, 06_52_05 PM.png" alt="David Resell Store Logo" style="max-width: 200px;">
+    <div class="header-content">
+      <img src="css/imaage/ChatGPT Image Jun 15, 2025, 06_52_05 PM.png" alt="David Resell Store Logo" style="max-width: 200px;">
+    </div>
   </header>
 
   <section id="landing">
@@ -58,7 +68,7 @@
   <div class="grid" id="productContainer"></div>
 
   <!-- Cart Preview -->
-  <div id="cartPreview">
+  <div id="cartPreview" class="cart-hidden">
     <h3>Your Cart</h3>
     <ul id="cartItems"></ul>
     <div id="totalAmount"></div>
@@ -280,18 +290,24 @@ function addToCart(productId) {
 function updateCartPreview() {
   const cartItems = document.getElementById('cartItems');
   const totalAmount = document.getElementById('totalAmount');
+  const cartCount = document.getElementById('cartCount');
+  
   cartItems.innerHTML = '';
   let total = 0;
+  let itemCount = 0;
 
   if (cart.length === 0) {
     cartItems.innerHTML = '<li>Your cart is empty.</li>';
     totalAmount.textContent = '';
+    cartCount.textContent = '0';
+    cartCount.style.display = 'none';
     return;
   }
 
   cart.forEach((item, index) => {
     const itemTotal = item.qty * item.price;
     total += itemTotal;
+    itemCount += item.qty;
     const li = document.createElement('li');
     li.innerHTML = `
       <span>${item.name}${item.variant ? ' - ' + item.variant : ''}</span>
@@ -305,6 +321,8 @@ function updateCartPreview() {
   });
 
   totalAmount.textContent = `Total: $${total}`;
+  cartCount.textContent = itemCount;
+  cartCount.style.display = itemCount > 0 ? 'flex' : 'none';
 }
 
 function changeQty(index, newQty) {
@@ -325,6 +343,13 @@ document.getElementById('enterStoreBtn').addEventListener('click', () => {
 window.addEventListener('DOMContentLoaded', () => {
   renderProducts();
   updateCartPreview();
+
+  // Cart icon toggle functionality
+  document.getElementById('cartIconContainer').addEventListener('click', () => {
+    const cartPreview = document.getElementById('cartPreview');
+    cartPreview.classList.toggle('cart-hidden');
+    cartPreview.classList.toggle('cart-visible');
+  });
 
   document.getElementById('clearCartBtn').onclick = () => {
     cart.length = 0;
